@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tüm Ürünler - Jakar Collections</title>
+  <style>
+    /* Temel Stiller */
+    body {
+      background: #fff;
+      color: #000;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+    }
+    header .logo img {
+      height: 50px;
+      margin-right: 10px;
+    }
+    header .logo span {
+      color: #f39c12;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li {
+      margin: 5px 10px;
+    }
+    nav ul li a {
+      color: #fff;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+    nav ul li a:hover {
+      color: #f39c12;
+    }
+    .search-bar {
+      position: relative;
+    }
+    .search-bar input {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+    }
+    #cart-button {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    footer {
+      background: #000;
+      color: #C7A319;
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 2rem;
+      position: relative;
+    }
+    .footer-columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .footer-column h3 {
+      margin-bottom: 0.5rem;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-column ul li {
+      margin-bottom: 0.3rem;
+    }
+    .footer-column ul li a {
+      color: #C7A319;
+      text-decoration: underline;
+    }
+    .footer-logo {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 80px;
+    }
+    /* Sayfa Düzeni: Sol filtre paneli ve ürün grid */
+    .content {
+      display: flex;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      gap: 1rem;
+    }
+    /* Filtre Paneli */
+    .filter-panel {
+      flex: 0 0 250px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+    .filter-title {
+      font-size: 18px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .accordion-section {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 0.3rem;
+    }
+    .accordion-header .arrow {
+      transition: transform 0.3s;
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .accordion-section.expanded .accordion-content {
+      max-height: 400px;
+    }
+    .accordion-section.expanded .arrow {
+      transform: rotate(180deg);
+    }
+    .filter-search {
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    .option-list label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 14px;
+    }
+    .option-list input[type="checkbox"] {
+      margin-right: 5px;
+    }
+    .filter-buttons {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .filter-panel button {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #applyFilters {
+      background: #000;
+      color: #fff;
+    }
+    #applyFilters:hover {
+      background: #444;
+    }
+    #clearFilters {
+      background: #777;
+      color: #fff;
+    }
+    #clearFilters:hover {
+      background: #555;
+    }
+    /* Yeni Filtreler: Cinsiyet, Kumaş Tipi, Yaka Tipi, Fiyat Aralığı */
+    .filter-group.range-group input {
+      width: 45%;
+      padding: 0.3rem;
+      margin-right: 5%;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    .filter-group.range-group input:last-child {
+      margin-right: 0;
+    }
+    /* Ürün Grid */
+    .products-container {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-start;
+    }
+    /* Ürün Kartı */
+    .product-card {
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    /* Resim kapsayıcı: 1920:1350 oranı ≈70.3% */
+    .image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 70.3%;
+      overflow: hidden;
+    }
+    .image-container img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .product-details {
+      padding: 0.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .product-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .product-reviews {
+      font-size: 12px;
+      color: #555;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .product-price {
+      font-size: 14px;
+      font-weight: bold;
+      color: #000;
+    }
+    /* Responsive */
+    @media (max-width: 992px) {
+      .product-card { width: calc(25% - 1rem); }
+    }
+    @media (max-width: 768px) {
+      .content { flex-direction: column; }
+      .filter-panel { width: 100%; }
+      .product-card { width: calc(50% - 1rem); }
+      nav ul { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .product-card { width: 100%; }
+    }
+  </style>
+  <script src="common.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Jakar Collections"/>
+      <span>Jakar Collections</span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/index.html">AnaSayfa</a></li>
+        <li><a href="/yenigelenler.html">Yeni Gelenler</a></li>
+        <li><a href="/koleksiyonlar.html">Koleksiyonlar</a></li>
+        <li><a href="/kampanyalar.html">Kampanyalar</a></li>
+        <li><a href="/hakkimizda.html">Hakkımızda</a></li>
+        <li><a href="/all-products.html">Tüm Ürünler</a></li>
+        <li><a href="/iletisim.html">İletişim</a></li>
+      </ul>
+    </nav>
+    <div class="search-bar">
+      <input type="text" placeholder="Ara..." id="header-search"/>
+    </div>
+    <div id="cart-button">Sepet (<span id="cart-count">0</span>)</div>
+  </header>
+
+  <main>
+    <div class="content">
+      <!-- Filtre Paneli -->
+      <div class="filter-panel">
+        <div class="filter-title">Filtrele</div>
+
+        <!-- Kategori Accordion -->
+        <div class="accordion-section" id="categorySection">
+          <div class="accordion-header" onclick="toggleAccordion('categorySection')">
+            <span>Kategori</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="categorySearch" placeholder="Ara..."/>
+            <select id="filterCategory" style="width:100%; padding: 0.3rem; margin-bottom:0.5rem;">
+              <option value="">Hepsi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Marka Accordion -->
+        <div class="accordion-section" id="brandSection">
+          <div class="accordion-header" onclick="toggleAccordion('brandSection')">
+            <span>Marka</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="brandSearch" placeholder="Ara..."/>
+            <select id="filterBrand" style="width:100%; padding: 0.3rem; margin-bottom:0.5rem;">
+              <option value="">Hepsi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Renk Accordion -->
+        <div class="accordion-section" id="colorSection">
+          <div class="accordion-header" onclick="toggleAccordion('colorSection')">
+            <span>Renk</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="colorSearch" placeholder="Ara..."/>
+            <div class="option-list" id="filterColors"></div>
+          </div>
+        </div>
+
+        <!-- Beden Accordion -->
+        <div class="accordion-section" id="sizeSection">
+          <div class="accordion-header" onclick="toggleAccordion('sizeSection')">
+            <span>Beden</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="sizeSearch" placeholder="Ara..."/>
+            <div class="option-list" id="filterSizes"></div>
+          </div>
+        </div>
+
+        <!-- Cinsiyet Accordion -->
+        <div class="accordion-section" id="genderSection">
+          <div class="accordion-header" onclick="toggleAccordion('genderSection')">
+            <span>Cinsiyet</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <select id="filterGender" style="width:100%; padding: 0.3rem; margin-bottom:0.5rem;">
+              <option value="">Hepsi</option>
+              <option value="Erkek">Erkek</option>
+              <option value="Kadın">Kadın</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Kumaş Tipi Accordion -->
+        <div class="accordion-section" id="fabricSection">
+          <div class="accordion-header" onclick="toggleAccordion('fabricSection')">
+            <span>Kumaş Tipi</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="fabricSearch" placeholder="Ara..."/>
+            <div class="option-list" id="filterFabric"></div>
+          </div>
+        </div>
+
+        <!-- Yaka Tipi Accordion -->
+        <div class="accordion-section" id="collarSection">
+          <div class="accordion-header" onclick="toggleAccordion('collarSection')">
+            <span>Yaka Tipi</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <input type="text" class="filter-search" id="collarSearch" placeholder="Ara..."/>
+            <div class="option-list" id="filterCollar"></div>
+          </div>
+        </div>
+
+        <!-- Fiyat Aralığı Accordion -->
+        <div class="accordion-section" id="priceSection">
+          <div class="accordion-header" onclick="toggleAccordion('priceSection')">
+            <span>Fiyat Aralığı</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content">
+            <div class="filter-group range-group">
+              <input type="number" id="minPrice" placeholder="Min Fiyat" min="0" style="width:45%;">
+              <input type="number" id="maxPrice" placeholder="Max Fiyat" min="0" style="width:45%;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Diğer Özellikler Accordion -->
+        <div class="accordion-section" id="otherSection">
+          <div class="accordion-header" onclick="toggleAccordion('otherSection')">
+            <span>Avantajlı Ürünler</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="accordion-content" style="padding-top:1rem;">
+            <label>
+              <input type="checkbox" id="filterFirsat"/>
+              Fırsat (%15+)
+            </label>
+            <label>
+              <input type="checkbox" id="filterIndirim"/>
+              İndirimli
+            </label>
+            <label>
+              <input type="checkbox" id="filterKargo"/>
+              Ücretsiz Kargo
+            </label>
+            <label>
+              <input type="checkbox" id="filterHizli"/>
+              Hızlı Teslimat
+            </label>
+          </div>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="filter-buttons">
+          <button id="applyFilters">Filtrele</button>
+          <button id="clearFilters">Temizle</button>
+        </div>
+      </div>
+
+      <!-- Ürün Grid -->
+      <div class="products-container" id="productsContainer">
+        <!-- Ürün kartları burada oluşturulacak -->
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h3>Kategoriler</h3>
+        <ul id="footerCategories">
+          <!-- Dinamik olarak eklenecek -->
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Ödeme / KVKK</h3>
+        <ul>
+          <li><a href="#">Kredi Kartı</a></li>
+          <li><a href="#">Havale/EFT</a></li>
+          <li><a href="#">PayPal (Yurt Dışı)</a></li>
+          <li><a href="#">KVKK Politikası</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>İletişim</h3>
+        <ul>
+          <li><a href="mailto:jakarcollections@gmail.com">jakarcollections@gmail.com</a></li>
+          <li><a href="https://wa.me/905013724347">WhatsApp: 05013724347</a></li>
+          <li><a href="https://instagram.com/jakarcollections" target="_blank">Instagram: @jakarcollections</a></li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top: 1rem;">&copy; 2025 Jakar Collections - Tüm Hakları Saklıdır.</p>
+    <img src="logo.png" alt="Jakar Collections" class="footer-logo"/>
+  </footer>
+
+  <script>
+    // getData() fonksiyonunun common.js'de tanımlı olduğunu varsayıyoruz.
+    const data = getData();
+
+    // Accordion açma/kapama mantığı
+    function toggleAccordion(sectionId) {
+      const section = document.getElementById(sectionId);
+      section.classList.toggle("expanded");
+    }
+
+    // Ürün kartlarını render eden fonksiyon (kartın tamamı tıklanabilir)
+    function renderProducts(products) {
+      const container = document.getElementById("productsContainer");
+      container.innerHTML = "";
+      products.forEach(product => {
+        let priceHtml = `₺${product.price}`;
+        if (product.discount > 0) {
+          const discountedPrice = (product.price * (1 - product.discount / 100)).toFixed(2);
+          priceHtml = `<s>₺${product.price}</s><br/>₺${discountedPrice}`;
+        }
+        const imgSrc = (product.images && product.images.length > 0)
+          ? product.images[0]
+          : product.image || "default.png";
+
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.onclick = () => { location.href = `/product.html?id=${product.id}`; };
+
+        card.innerHTML = `
+          <div class="image-container">
+            <img src="${imgSrc}" alt="${product.title}">
+          </div>
+          <div class="product-details">
+            <h3 class="product-title">${product.title}</h3>
+            <div class="product-reviews" style="font-size:12px; color:#555;">Yorumlara Git</div>
+            <p class="product-price">${priceHtml}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Filtre seçeneklerini dolduran fonksiyonu güncelliyoruz:
+    function populateFilterOptions() {
+      const categories = new Set();
+      const brands = new Set();
+      const colors = new Set();
+      const sizes = new Set();
+      const genders = new Set();
+      const fabrics = new Set();
+      const collars = new Set();
+      data.products.forEach(product => {
+        if (product.category) categories.add(product.category);
+        if (product.brand) brands.add(product.brand);
+        if (product.colors) product.colors.forEach(c => colors.add(c));
+        if (product.sizes) product.sizes.forEach(s => sizes.add(s));
+        if (product.gender) genders.add(product.gender);
+        if (product.fabric) fabrics.add(product.fabric);
+        if (product.collar) collars.add(product.collar);
+      });
+
+      // Kategori
+      const filterCategory = document.getElementById("filterCategory");
+      filterCategory.innerHTML = '<option value="">Hepsi</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        filterCategory.appendChild(opt);
+      });
+      // Marka
+      const filterBrand = document.getElementById("filterBrand");
+      filterBrand.innerHTML = '<option value="">Hepsi</option>';
+      brands.forEach(brand => {
+        const opt = document.createElement("option");
+        opt.value = brand;
+        opt.textContent = brand;
+        filterBrand.appendChild(opt);
+      });
+      // Renkler
+      const filterColors = document.getElementById("filterColors");
+      filterColors.innerHTML = "";
+      colors.forEach(color => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${color}"> ${color}`;
+        filterColors.appendChild(label);
+      });
+      // Bedenler
+      const filterSizes = document.getElementById("filterSizes");
+      filterSizes.innerHTML = "";
+      sizes.forEach(size => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${size}"> ${size}`;
+        filterSizes.appendChild(label);
+      });
+      // Cinsiyet
+      const filterGender = document.createElement("select");
+      filterGender.id = "filterGender";
+      filterGender.style.width = "100%";
+      filterGender.style.padding = "0.3rem";
+      filterGender.style.marginBottom = "0.5rem";
+      filterGender.innerHTML = '<option value="">Hepsi</option>';
+      genders.forEach(g => {
+        const opt = document.createElement("option");
+        opt.value = g;
+        opt.textContent = g;
+        filterGender.appendChild(opt);
+      });
+      // Kumaş Tipi
+      const filterFabric = document.createElement("div");
+      filterFabric.id = "filterFabric";
+      filterFabric.className = "option-list";
+      fabrics.forEach(fab => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${fab}"> ${fab}`;
+        filterFabric.appendChild(label);
+      });
+      // Yaka Tipi
+      const filterCollar = document.createElement("div");
+      filterCollar.id = "filterCollar";
+      filterCollar.className = "option-list";
+      collars.forEach(col => {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${col}"> ${col}`;
+        filterCollar.appendChild(label);
+      });
+
+      // Bu yeni filtreleri, yeni accordion bölümleri şeklinde ekleyelim
+      // Önce, "Cinsiyet" için accordion, "Kumaş Tipi" için, "Yaka Tipi" için
+      // (Bu bölümleri HTML'de eklemediyseniz, dinamik olarak ekleyebilirsiniz veya sabit HTML içerisine yerleştirebilirsiniz.
+      // Burada, örnek olarak "Cinsiyet", "Kumaş Tipi" ve "Yaka Tipi" accordion bölümlerinin HTML'sini zaten eklediğinizi varsayıyorum.)
+      // Eğer HTML'de yoksa, bu filtreler için ayrı ID'li container'ları oluşturun.
+
+      // Örneğin: (HTML'de <div class="accordion-section" id="genderSection"> ... içinde bir <select id="filterGender"></select> ekleyin.)
+      // Burada biz sadece populateFilterOptions fonksiyonuna dahil ettik.
+      const genderSelect = document.getElementById("filterGender");
+      if(genderSelect) {
+        genderSelect.innerHTML = filterGender.innerHTML;
+      }
+      const fabricContainer = document.getElementById("filterFabric");
+      if(fabricContainer) {
+        fabricContainer.innerHTML = "";
+        fabrics.forEach(fab => {
+          const label = document.createElement("label");
+          label.innerHTML = `<input type="checkbox" value="${fab}"> ${fab}`;
+          fabricContainer.appendChild(label);
+        });
+      }
+      const collarContainer = document.getElementById("filterCollar");
+      if(collarContainer) {
+        collarContainer.innerHTML = "";
+        collars.forEach(col => {
+          const label = document.createElement("label");
+          label.innerHTML = `<input type="checkbox" value="${col}"> ${col}`;
+          collarContainer.appendChild(label);
+        });
+      }
+    }
+
+    // Filtre uygulama fonksiyonu (ekstra filtre alanları dahil)
+    function applyFilters() {
+      let filtered = data.products.slice();
+      const catVal = document.getElementById("filterCategory").value;
+      if (catVal) filtered = filtered.filter(p => p.category === catVal);
+      const brandVal = document.getElementById("filterBrand").value;
+      if (brandVal) filtered = filtered.filter(p => p.brand === brandVal);
+      const selectedColors = Array.from(document.querySelectorAll("#filterColors input:checked")).map(el => el.value);
+      if (selectedColors.length > 0) filtered = filtered.filter(p => p.colors && selectedColors.some(c => p.colors.includes(c)));
+      const selectedSizes = Array.from(document.querySelectorAll("#filterSizes input:checked")).map(el => el.value);
+      if (selectedSizes.length > 0) filtered = filtered.filter(p => p.sizes && selectedSizes.some(s => p.sizes.includes(s)));
+      if(document.getElementById("filterGender")){
+        const genderVal = document.getElementById("filterGender").value;
+        if(genderVal) filtered = filtered.filter(p => p.gender === genderVal);
+      }
+      if(document.getElementById("filterFabric")){
+        const selectedFabrics = Array.from(document.querySelectorAll("#filterFabric input:checked")).map(el => el.value);
+        if(selectedFabrics.length > 0) filtered = filtered.filter(p => p.fabric && selectedFabrics.some(f => p.fabric.includes(f)));
+      }
+      if(document.getElementById("filterCollar")){
+        const selectedCollars = Array.from(document.querySelectorAll("#filterCollar input:checked")).map(el => el.value);
+        if(selectedCollars.length > 0) filtered = filtered.filter(p => p.collar && selectedCollars.some(c => p.collar.includes(c)));
+      }
+      // Fiyat aralığı
+      const minPrice = parseFloat(document.getElementById("minPrice")?.value) || 0;
+      const maxPrice = parseFloat(document.getElementById("maxPrice")?.value) || Infinity;
+      filtered = filtered.filter(p => p.price >= minPrice && p.price <= maxPrice);
+      if (document.getElementById("filterFirsat").checked) filtered = filtered.filter(p => p.discount >= 15);
+      if (document.getElementById("filterIndirim").checked) filtered = filtered.filter(p => p.discount > 0);
+      if (document.getElementById("filterKargo").checked) filtered = filtered.filter(p => p.features && p.features.toLowerCase().includes("ücretsiz kargo"));
+      if (document.getElementById("filterHizli").checked) filtered = filtered.filter(p => p.features && p.features.toLowerCase().includes("hızlı teslimat"));
+      renderProducts(filtered);
+    }
+
+    // Filtreleri temizleme fonksiyonu
+    function clearFilters() {
+      document.getElementById("filterCategory").value = "";
+      document.getElementById("filterBrand").value = "";
+      document.querySelectorAll("#filterColors input").forEach(el => el.checked = false);
+      document.querySelectorAll("#filterSizes input").forEach(el => el.checked = false);
+      if(document.getElementById("filterGender")) document.getElementById("filterGender").value = "";
+      if(document.getElementById("filterFabric")) document.querySelectorAll("#filterFabric input").forEach(el => el.checked = false);
+      if(document.getElementById("filterCollar")) document.querySelectorAll("#filterCollar input").forEach(el => el.checked = false);
+      if(document.getElementById("minPrice")) document.getElementById("minPrice").value = "";
+      if(document.getElementById("maxPrice")) document.getElementById("maxPrice").value = "";
+      document.getElementById("filterFirsat").checked = false;
+      document.getElementById("filterIndirim").checked = false;
+      document.getElementById("filterKargo").checked = false;
+      document.getElementById("filterHizli").checked = false;
+      renderProducts(data.products);
+    }
+
+    // Olay dinleyiciler
+    document.getElementById("applyFilters").addEventListener("click", applyFilters);
+    document.getElementById("clearFilters").addEventListener("click", clearFilters);
+
+    // Accordion arama örnekleri (kategori, marka, renk, beden)
+    document.getElementById("categorySearch").addEventListener("input", () => filterDropdown("categorySearch","filterCategory"));
+    document.getElementById("brandSearch").addEventListener("input", () => filterDropdown("brandSearch","filterBrand"));
+    document.getElementById("colorSearch").addEventListener("input", () => filterCheckboxes("colorSearch","filterColors"));
+    document.getElementById("sizeSearch").addEventListener("input", () => filterCheckboxes("sizeSearch","filterSizes"));
+
+    // Basit arama fonksiyonları
+    function filterDropdown(searchInputId, dropdownId) {
+      const searchVal = document.getElementById(searchInputId).value.toLowerCase();
+      const dropdown = document.getElementById(dropdownId);
+      Array.from(dropdown.options).forEach(opt => {
+        opt.style.display = opt.textContent.toLowerCase().includes(searchVal) ? "block" : "none";
+      });
+    }
+    function filterCheckboxes(searchInputId, containerId) {
+      const searchVal = document.getElementById(searchInputId).value.toLowerCase();
+      const container = document.getElementById(containerId);
+      container.querySelectorAll("label").forEach(lbl => {
+        lbl.style.display = lbl.textContent.toLowerCase().includes(searchVal) ? "block" : "none";
+      });
+    }
+
+    // Sayfa yüklendiğinde filtre seçeneklerini doldur ve ürünleri render et
+    window.addEventListener("load", function() {
+      populateFilterOptions();
+      renderProducts(data.products);
+    });
+  </script>
+</body>
+</html>

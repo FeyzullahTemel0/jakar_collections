@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - Jakar Collections</title>
+  <style>
+    /* Genel Stilller */
+    body {
+      background: #fff;
+      color: #fff;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+    }
+    header .logo img {
+      height: 50px;
+      margin-right: 10px;
+    }
+    header .logo span {
+      color: #f39c12;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li {
+      margin: 5px 10px;
+    }
+    nav ul li a {
+      color: #fff;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+    nav ul li a:hover {
+      color: #f39c12;
+    }
+    .search-bar {
+      position: relative;
+    }
+    .search-bar input {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+    }
+    #cart-button {
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    footer {
+      background: #000;
+      color: #C7A319;
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 2rem;
+      position: relative;
+    }
+    .footer-columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .footer-column h3 {
+      margin-bottom: 0.5rem;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-column ul li {
+      margin-bottom: 0.3rem;
+    }
+    .footer-column ul li a {
+      color: #C7A319;
+      text-decoration: underline;
+    }
+    .footer-logo {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 80px;
+    }
+    /* Admin Panel Tasarımı */
+    .admin-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 2px solid #d4af37;
+      margin-bottom: 1rem;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-right: 5px;
+      border: 1px solid #d4af37;
+      border-bottom: none;
+      background: #222;
+      color: #fff;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .tab.active {
+      background: #000;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+      background: #000;
+      color: #fff;
+      padding: 1rem;
+      border: 1px solid #d4af37;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    form {
+      margin-bottom: 2rem;
+    }
+    form input, form select, form textarea {
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d4af37;
+      border-radius: 3px;
+      background: #333;
+      color: #fff;
+    }
+    form input::placeholder, form textarea::placeholder {
+      color: #aaa;
+    }
+    form button {
+      padding: 0.5rem 1rem;
+      background: #d4af37;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    form button:hover {
+      background: #b3922a;
+    }
+    input[type="checkbox"] {
+      accent-color: #f39c12;
+    }
+    /* Ürün Yönetimi Tab */
+    .product-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #000;
+      color: #fff;
+    }
+    .product-table th, .product-table td {
+      border: 1px solid #d4af37;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .product-table img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+    /* Koleksiyon Yönetimi Tab */
+    .collection-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #000;
+      color: #fff;
+    }
+    .collection-table th, .collection-table td {
+      border: 1px solid #d4af37;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .collection-table img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+    /* Yönetim Sekmeleri: Yaka & Kumaş Yönetimi */
+    .management-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #000;
+      color: #fff;
+    }
+    .management-table th, .management-table td {
+      border: 1px solid #d4af37;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    /* Edit Modals */
+    #editProductFormContainer, #editCollectionFormContainer,
+    #editCollarFormContainer, #editFabricFormContainer {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #editProductFormContainer .form-content,
+    #editCollectionFormContainer .form-content,
+    #editCollarFormContainer .form-content,
+    #editFabricFormContainer .form-content {
+      background: #000;
+      padding: 2rem;
+      border: 1px solid #d4af37;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 100%;
+      color: #fff;
+    }
+    #editProductFormContainer .form-content h2,
+    #editCollectionFormContainer .form-content h2,
+    #editCollarFormContainer .form-content h2,
+    #editFabricFormContainer .form-content h2 {
+      margin-bottom: 1rem;
+    }
+    #editProductFormContainer .form-actions,
+    #editCollectionFormContainer .form-actions,
+    #editCollarFormContainer .form-actions,
+    #editFabricFormContainer .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+  </style>
+  <script src="common.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Jakar Collections" />
+      <span>Jakar Collections</span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/index.html">AnaSayfa</a></li>
+        <li><a href="/yenigelenler.html">Yeni Gelenler</a></li>
+        <li><a href="/koleksiyonlar.html">Koleksiyonlar</a></li>
+        <li><a href="/kampanyalar.html">Kampanyalar</a></li>
+        <li><a href="/hakkimizda.html">Hakkımızda</a></li>
+        <li><a href="/all-products.html">Tüm Ürünler</a></li>
+        <li><a href="/iletisim.html">İletişim</a></li>
+      </ul>
+    </nav>
+    <div class="search-bar">
+      <input type="text" placeholder="Ara..." id="header-search" />
+    </div>
+    <div id="cart-button">Sepet (<span id="cart-count">0</span>)</div>
+  </header>
+
+  <main>
+    <div class="admin-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="addProduct">Ürün Ekle</div>
+        <div class="tab" data-tab="manageProduct">Ürün Yönetimi</div>
+        <div class="tab" data-tab="collection">Koleksiyon Ekle</div>
+        <div class="tab" data-tab="collectionManage">Koleksiyon Yönetimi</div>
+        <div class="tab" data-tab="category">Kategori Yönetimi</div>
+        <div class="tab" data-tab="campaign">Kampanya Güncelle</div>
+        <div class="tab" data-tab="collarManage">Yaka Yönetimi</div>
+        <div class="tab" data-tab="fabricManage">Kumaş Yönetimi</div>
+      </div>
+
+      <!-- Ürün Ekleme Sekmesi -->
+      <div id="addProduct" class="tab-content active">
+        <h2>Ürün Ekle</h2>
+        <form id="productForm">
+          <input type="text" id="productName" placeholder="Ürün adını giriniz..." required />
+          <input type="number" id="productPrice" placeholder="Fiyatı giriniz..." required step="0.01" />
+          <label>Resimler (birden fazla seçebilirsiniz):</label>
+          <input type="file" id="productImages" multiple accept="image/*" required />
+          <textarea id="productDescription" placeholder="Ürün açıklamasını giriniz..." required></textarea>
+          <label>Kategori:</label>
+          <select id="productCategorySelect" required>
+            <option value="">Kategori Seçiniz</option>
+          </select>
+          <label>Koleksiyon:</label>
+          <select id="productCollectionSelect" required>
+            <option value="">Koleksiyon Seçiniz</option>
+          </select>
+          <label>Marka:</label>
+          <input type="text" id="productBrand" placeholder="Marka adını giriniz..." />
+          <label>Cinsiyet:</label>
+          <select id="productGender" required>
+            <option value="">Seçiniz</option>
+            <option value="Erkek">Erkek</option>
+            <option value="Kadın">Kadın</option>
+            <option value="Unisex">Unisex</option>
+          </select>
+          <!-- Kumaş ve Yaka: select alanı olarak eklendi -->
+          <label>Kumaş Tipi:</label>
+          <select id="productFabricSelect" required>
+            <option value="">Kumaş Seçiniz</option>
+          </select>
+          <label>Yaka Tipi:</label>
+          <select id="productCollarSelect" required>
+            <option value="">Yaka Seçiniz</option>
+          </select>
+          <label>Renkler (Ctrl ile çoklu seçim yapın):</label>
+          <select id="productColors" multiple>
+            <option value="Kırmızı">Kırmızı</option>
+            <option value="Mavi">Mavi</option>
+            <option value="Yeşil">Yeşil</option>
+            <option value="Siyah">Siyah</option>
+            <option value="Beyaz">Beyaz</option>
+          </select>
+          <label>Bedenler (Ctrl ile çoklu seçim yapın):</label>
+          <select id="productSizes" multiple>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="Bedensiz">Bedensiz</option>
+          </select>
+          <input type="number" id="productDiscount" placeholder="İndirim oranını giriniz (%)" value="0" />
+          <textarea id="productFeatures" placeholder="Ürün özelliklerini giriniz..." required>
+Kargo: Ücretsiz kargo, 30 dereceden fazla ısıda yıkamayın
+          </textarea>
+          <button type="submit">Ürünü Ekle</button>
+        </form>
+      </div>
+
+      <!-- Ürün Yönetimi Sekmesi -->
+      <div id="manageProduct" class="tab-content">
+        <h2>Ürün Yönetimi</h2>
+        <table class="product-table" id="productTable">
+          <thead>
+            <tr>
+              <th>Resim</th>
+              <th>Başlık</th>
+              <th>Fiyat</th>
+              <th>İndirim</th>
+              <th>Kategori</th>
+              <th>Koleksiyon</th>
+              <th>Cinsiyet</th>
+              <th>Kumaş</th>
+              <th>Yaka</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Ürünler dinamik olarak eklenecek -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Koleksiyon Ekleme Sekmesi -->
+      <div id="collection" class="tab-content">
+        <h2>Koleksiyon Ekle</h2>
+        <form id="collectionForm">
+          <input type="text" id="collectionTitle" placeholder="Koleksiyon adını giriniz..." required />
+          <input type="text" id="collectionImage" placeholder="Koleksiyon resim URL'sini giriniz..." required />
+          <input type="text" id="collectionLink" placeholder="Bağlantı (örn: /koleksiyonlar.html?collection=kış sezonu)" required />
+          <button type="submit">Koleksiyonu Ekle</button>
+        </form>
+      </div>
+
+      <!-- Koleksiyon Yönetimi Sekmesi -->
+      <div id="collectionManage" class="tab-content">
+        <h2>Koleksiyon Yönetimi</h2>
+        <table class="collection-table" id="collectionTable">
+          <thead>
+            <tr>
+              <th>Koleksiyon Adı</th>
+              <th>Resim</th>
+              <th>Link</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Koleksiyonlar dinamik olarak eklenecek -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Kategori Yönetimi Sekmesi -->
+      <div id="category" class="tab-content">
+        <h2>Kategori Yönetimi</h2>
+        <form id="categoryForm">
+          <input type="text" id="categoryName" placeholder="Kategori adını giriniz..." required />
+          <button type="submit">Kategori Ekle</button>
+        </form>
+        <div id="categoryList">
+          <!-- Eklenen kategoriler listelenecek -->
+        </div>
+      </div>
+
+      <!-- Kampanya Güncelleme Sekmesi -->
+      <div id="campaign" class="tab-content">
+        <h2>Kampanya Güncelle</h2>
+        <form id="campaignForm">
+          <select id="campaignProductSelect" required>
+            <option value="">Ürün Seçiniz</option>
+          </select>
+          <input type="number" id="campaignDiscount" placeholder="Yeni İndirim (%) giriniz" required />
+          <button type="submit">Güncelle</button>
+        </form>
+      </div>
+
+      <!-- Yaka Yönetimi Sekmesi -->
+      <div id="collarManage" class="tab-content">
+        <h2>Yaka Yönetimi</h2>
+        <form id="collarForm">
+          <input type="text" id="collarName" placeholder="Yaka tipini giriniz..." required />
+          <button type="submit">Yaka Ekle</button>
+        </form>
+        <table class="management-table" id="collarTable">
+          <thead>
+            <tr>
+              <th>Yaka Tipi</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Yaka tipleri listelenecek -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Kumaş Yönetimi Sekmesi -->
+      <div id="fabricManage" class="tab-content">
+        <h2>Kumaş Yönetimi</h2>
+        <form id="fabricForm">
+          <input type="text" id="fabricName" placeholder="Kumaş tipini giriniz..." required />
+          <button type="submit">Kumaş Ekle</button>
+        </form>
+        <table class="management-table" id="fabricTable">
+          <thead>
+            <tr>
+              <th>Kumaş Tipi</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Kumaş tipleri listelenecek -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Edit Product Modal -->
+      <div id="editProductFormContainer">
+        <div class="form-content">
+          <h2>Ürünü Düzenle</h2>
+          <form id="editProductForm">
+            <input type="hidden" id="editProductId" />
+            <input type="text" id="editProductName" placeholder="Ürün adını giriniz..." required />
+            <input type="number" id="editProductPrice" placeholder="Fiyatı giriniz..." required step="0.01" />
+            <label>Yeni Resimler (Varsa):</label>
+            <input type="file" id="editProductImages" multiple accept="image/*" />
+            <textarea id="editProductDescription" placeholder="Ürün açıklamasını giriniz..." required></textarea>
+            <label>Kategori:</label>
+            <select id="editProductCategorySelect" required>
+              <option value="">Kategori Seçiniz</option>
+            </select>
+            <label>Koleksiyon:</label>
+            <select id="editProductCollectionSelect" required>
+              <option value="">Koleksiyon Seçiniz</option>
+            </select>
+            <input type="text" id="editProductBrand" placeholder="Marka adını giriniz..." />
+            <label>Cinsiyet:</label>
+            <select id="editProductGender" required>
+              <option value="">Seçiniz</option>
+              <option value="Erkek">Erkek</option>
+              <option value="Kadın">Kadın</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+            <!-- Kumaş ve Yaka alanları select olarak güncellendi -->
+            <label>Kumaş Tipi:</label>
+            <select id="editProductFabricSelect" required>
+              <option value="">Kumaş Seçiniz</option>
+            </select>
+            <label>Yaka Tipi:</label>
+            <select id="editProductCollarSelect" required>
+              <option value="">Yaka Seçiniz</option>
+            </select>
+            <label>Renkler (Ctrl ile çoklu seçim yapın):</label>
+            <select id="editProductColors" multiple>
+              <option value="Kırmızı">Kırmızı</option>
+              <option value="Mavi">Mavi</option>
+              <option value="Yeşil">Yeşil</option>
+              <option value="Siyah">Siyah</option>
+              <option value="Beyaz">Beyaz</option>
+            </select>
+            <label>Bedenler (Ctrl ile çoklu seçim yapın):</label>
+            <select id="editProductSizes" multiple>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="Bedensiz">Bedensiz</option>
+            </select>
+            <input type="number" id="editProductDiscount" placeholder="İndirim oranını giriniz (%)" required />
+            <textarea id="editProductFeatures" placeholder="Ürün özelliklerini giriniz..." required></textarea>
+            <div class="form-actions">
+              <button type="submit">Kaydet</button>
+              <button type="button" onclick="closeEditForm()">İptal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Edit Collection Modal -->
+      <div id="editCollectionFormContainer">
+        <div class="form-content">
+          <h2>Koleksiyonu Düzenle</h2>
+          <form id="editCollectionForm">
+            <input type="hidden" id="editCollectionId" />
+            <input type="text" id="editCollectionTitle" placeholder="Koleksiyon adını giriniz..." required />
+            <input type="text" id="editCollectionImage" placeholder="Koleksiyon resim URL'sini giriniz..." required />
+            <input type="text" id="editCollectionLink" placeholder="Bağlantı (örn: /koleksiyonlar.html?collection=kış sezonu)" required />
+            <div class="form-actions">
+              <button type="submit">Kaydet</button>
+              <button type="button" onclick="closeEditCollectionForm()">İptal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Edit Yaka Modal -->
+      <div id="editCollarFormContainer">
+        <div class="form-content">
+          <h2>Yaka Tipini Düzenle</h2>
+          <form id="editCollarForm">
+            <input type="hidden" id="editCollarId" />
+            <input type="text" id="editCollarName" placeholder="Yaka tipini giriniz..." required />
+            <div class="form-actions">
+              <button type="submit">Kaydet</button>
+              <button type="button" onclick="closeEditCollarForm()">İptal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Edit Kumaş Modal -->
+      <div id="editFabricFormContainer">
+        <div class="form-content">
+          <h2>Kumaş Tipini Düzenle</h2>
+          <form id="editFabricForm">
+            <input type="hidden" id="editFabricId" />
+            <input type="text" id="editFabricName" placeholder="Kumaş tipini giriniz..." required />
+            <div class="form-actions">
+              <button type="submit">Kaydet</button>
+              <button type="button" onclick="closeEditFabricForm()">İptal</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h3>Kategoriler</h3>
+        <ul id="footerCategories">
+          <!-- Dinamik olarak eklenecek -->
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Ödeme / KVKK</h3>
+        <ul>
+          <li><a href="#">Kredi Kartı</a></li>
+          <li><a href="#">Havale/EFT</a></li>
+          <li><a href="#">PayPal (Yurt Dışı)</a></li>
+          <li><a href="#">KVKK Politikası</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>İletişim</h3>
+        <ul>
+          <li><a href="mailto:jakarcollections@gmail.com">jakarcollections@gmail.com</a></li>
+          <li><a href="https://wa.me/905013724347">WhatsApp: 05013724347</a></li>
+          <li><a href="https://instagram.com/jakarcollections" target="_blank">Instagram: @jakarcollections</a></li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top: 1rem;">&copy; 2025 Jakar Collections - Tüm Hakları Saklıdır.</p>
+    <img src="logo.png" alt="Jakar Collections" class="footer-logo" />
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // getData() fonksiyonunun common.js'de tanımlı olduğunu varsayıyoruz.
+      const data = getData();
+      if (!data.collars) data.collars = [];
+      if (!data.fabrics) data.fabrics = [];
+
+      // Ürün, Koleksiyon, Kategori, Kampanya işlemleri
+
+      function populateCategorySelect() {
+        const catSelect = document.getElementById('productCategorySelect');
+        catSelect.innerHTML = '<option value="">Kategori Seçiniz</option>';
+        data.categories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          catSelect.appendChild(option);
+        });
+        const editCatSelect = document.getElementById('editProductCategorySelect');
+        if(editCatSelect) {
+          editCatSelect.innerHTML = '<option value="">Kategori Seçiniz</option>';
+          data.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            editCatSelect.appendChild(option);
+          });
+        }
+        const footerList = document.getElementById('footerCategories');
+        footerList.innerHTML = "";
+        data.categories.forEach(cat => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="#">${cat}</a>`;
+          footerList.appendChild(li);
+        });
+      }
+
+      function populateCollectionSelect() {
+        const collSelect = document.getElementById('productCollectionSelect');
+        collSelect.innerHTML = '<option value="">Koleksiyon Seçiniz</option>';
+        data.collections.forEach(coll => {
+          const option = document.createElement('option');
+          option.value = coll.title;
+          option.textContent = coll.title;
+          collSelect.appendChild(option);
+        });
+        const editCollSelect = document.getElementById('editProductCollectionSelect');
+        if (editCollSelect) {
+          editCollSelect.innerHTML = '<option value="">Koleksiyon Seçiniz</option>';
+          data.collections.forEach(coll => {
+            const option = document.createElement('option');
+            option.value = coll.title;
+            option.textContent = coll.title;
+            editCollSelect.appendChild(option);
+          });
+        }
+      }
+
+      function populateCampaignSelect() {
+        const select = document.getElementById('campaignProductSelect');
+        select.innerHTML = '<option value="">Ürün Seçiniz</option>';
+        data.products.forEach(product => {
+          const option = document.createElement('option');
+          option.value = product.id;
+          option.textContent = product.title;
+          select.appendChild(option);
+        });
+      }
+
+      // Yeni: Kumaş ve Yaka için select alanlarını dolduran fonksiyonlar
+      function populateFabricSelect() {
+        const fabricSelect = document.getElementById('productFabricSelect');
+        fabricSelect.innerHTML = '<option value="">Kumaş Seçiniz</option>';
+        data.fabrics.forEach(fabric => {
+          const option = document.createElement('option');
+          option.value = fabric.name;
+          option.textContent = fabric.name;
+          fabricSelect.appendChild(option);
+        });
+        const editFabricSelect = document.getElementById('editProductFabricSelect');
+        if (editFabricSelect) {
+          editFabricSelect.innerHTML = '<option value="">Kumaş Seçiniz</option>';
+          data.fabrics.forEach(fabric => {
+            const option = document.createElement('option');
+            option.value = fabric.name;
+            option.textContent = fabric.name;
+            editFabricSelect.appendChild(option);
+          });
+        }
+      }
+
+      function populateCollarSelect() {
+        const collarSelect = document.getElementById('productCollarSelect');
+        collarSelect.innerHTML = '<option value="">Yaka Seçiniz</option>';
+        data.collars.forEach(collar => {
+          const option = document.createElement('option');
+          option.value = collar.name;
+          option.textContent = collar.name;
+          collarSelect.appendChild(option);
+        });
+        const editCollarSelect = document.getElementById('editProductCollarSelect');
+        if (editCollarSelect) {
+          editCollarSelect.innerHTML = '<option value="">Yaka Seçiniz</option>';
+          data.collars.forEach(collar => {
+            const option = document.createElement('option');
+            option.value = collar.name;
+            option.textContent = collar.name;
+            editCollarSelect.appendChild(option);
+          });
+        }
+      }
+
+      // Ürün Ekleme
+      document.getElementById('productForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const title = document.getElementById('productName').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const description = document.getElementById('productDescription').value;
+        const category = document.getElementById('productCategorySelect').value;
+        const collection = document.getElementById('productCollectionSelect').value;
+        const brand = document.getElementById('productBrand').value;
+        const colors = Array.from(document.getElementById('productColors').selectedOptions).map(opt => opt.value);
+        const sizes = Array.from(document.getElementById('productSizes').selectedOptions).map(opt => opt.value);
+        const gender = document.getElementById('productGender').value;
+        const fabric = document.getElementById('productFabricSelect').value;
+        const collar = document.getElementById('productCollarSelect').value;
+        const discount = parseFloat(document.getElementById('productDiscount').value);
+        const features = document.getElementById('productFeatures').value;
+        
+        const fileInput = document.getElementById('productImages');
+        readFiles(fileInput.files).then(images => {
+          const product = {
+            title,
+            price,
+            images,
+            description,
+            category,
+            collection,
+            brand,
+            gender,
+            fabric,
+            collar,
+            colors,
+            sizes,
+            discount,
+            features,
+            dateAdded: new Date().toISOString()
+          };
+          addProduct(product);
+          alert('Ürün eklendi!');
+          document.getElementById('productForm').reset();
+          populateCampaignSelect();
+          renderProductTable();
+        }).catch(err => {
+          alert("Resim yüklemede hata oluştu: " + err);
+        });
+      });
+
+      // Koleksiyon Ekleme
+      document.getElementById('collectionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const collection = {
+          title: document.getElementById('collectionTitle').value,
+          image: document.getElementById('collectionImage').value,
+          link: document.getElementById('collectionLink').value
+        };
+        addCollection(collection);
+        alert('Koleksiyon eklendi!');
+        this.reset();
+        renderCollectionTable();
+        populateCollectionSelect();
+      });
+
+      // Kategori Ekleme
+      document.getElementById('categoryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const category = document.getElementById('categoryName').value;
+        addCategory(category);
+        const li = document.createElement('li');
+        li.textContent = category;
+        document.getElementById('categoryList').appendChild(li);
+        this.reset();
+        populateCategorySelect();
+      });
+
+      // Kampanya Güncelleme
+      document.getElementById('campaignForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const productId = document.getElementById('campaignProductSelect').value;
+        const discount = parseFloat(document.getElementById('campaignDiscount').value);
+        if (!productId) {
+          alert("Lütfen bir ürün seçiniz.");
+          return;
+        }
+        updateCampaign(productId, discount);
+        alert('Kampanya güncellendi!');
+        this.reset();
+        renderProductTable();
+      });
+
+      // Ürün Yönetimi: renderProductTable()
+      function renderProductTable() {
+        const data = getData();
+        const tbody = document.querySelector('#productTable tbody');
+        tbody.innerHTML = "";
+        data.products.forEach(product => {
+          let priceHtml = `₺${product.price}`;
+          if (product.discount >= 15) {
+            const discountedPrice = (product.price * (1 - product.discount / 100)).toFixed(2);
+            priceHtml = `<s>₺${product.price}</s><br/>₺${discountedPrice}`;
+          }
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><img src="${(product.images && product.images.length > 0) ? product.images[0] : (product.image || 'default.png')}" alt="${product.title}"></td>
+            <td>${product.title}</td>
+            <td>${priceHtml}</td>
+            <td>${product.discount}%</td>
+            <td>${product.category}</td>
+            <td>${product.collection || '-'}</td>
+            <td>${product.gender || '-'}</td>
+            <td>${product.fabric || '-'}</td>
+            <td>${product.collar || '-'}</td>
+            <td>
+              <button onclick="openEditForm(${product.id})">Düzenle</button>
+              <button onclick="deleteProduct(${product.id})">Sil</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function openEditForm(productId) {
+        const product = getProductById(productId);
+        if (product) {
+          document.getElementById('editProductId').value = product.id;
+          document.getElementById('editProductName').value = product.title;
+          document.getElementById('editProductPrice').value = product.price;
+          document.getElementById('editProductDescription').value = product.description;
+          document.getElementById('editProductBrand').value = product.brand || "";
+          document.getElementById('editProductDiscount').value = product.discount;
+          document.getElementById('editProductFeatures').value = product.features;
+          document.getElementById('editProductCategorySelect').value = product.category;
+          document.getElementById('editProductCollectionSelect').value = product.collection || "";
+          document.getElementById('editProductGender').value = product.gender || "";
+          document.getElementById('editProductFabricSelect').value = product.fabric || "";
+          document.getElementById('editProductCollarSelect').value = product.collar || "";
+          const colorSelect = document.getElementById('editProductColors');
+          Array.from(colorSelect.options).forEach(opt => {
+            opt.selected = product.colors && product.colors.includes(opt.value);
+          });
+          const sizeSelect = document.getElementById('editProductSizes');
+          Array.from(sizeSelect.options).forEach(opt => {
+            opt.selected = product.sizes && product.sizes.includes(opt.value);
+          });
+          document.getElementById('editProductFormContainer').style.display = "flex";
+        }
+      }
+
+      function closeEditForm() {
+        document.getElementById('editProductFormContainer').style.display = "none";
+      }
+
+      document.getElementById('editProductForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const productId = document.getElementById('editProductId').value;
+        const title = document.getElementById('editProductName').value;
+        const price = parseFloat(document.getElementById('editProductPrice').value);
+        const description = document.getElementById('editProductDescription').value;
+        const brand = document.getElementById('editProductBrand').value;
+        const discount = parseFloat(document.getElementById('editProductDiscount').value);
+        const features = document.getElementById('editProductFeatures').value;
+        const category = document.getElementById('editProductCategorySelect').value;
+        const collection = document.getElementById('editProductCollectionSelect').value;
+        const gender = document.getElementById('editProductGender').value;
+        const fabric = document.getElementById('editProductFabricSelect').value;
+        const collar = document.getElementById('editProductCollarSelect').value;
+        const colors = Array.from(document.getElementById('editProductColors').selectedOptions).map(opt => opt.value);
+        const sizes = Array.from(document.getElementById('editProductSizes').selectedOptions).map(opt => opt.value);
+        const fileInput = document.getElementById('editProductImages');
+        if (fileInput.files.length > 0) {
+          readFiles(fileInput.files).then(newImages => {
+            updateProduct(productId, {
+              title, price, description, brand, discount, features,
+              category, collection, gender, fabric, collar, colors, sizes,
+              images: newImages
+            });
+            alert("Ürün güncellendi!");
+            closeEditForm();
+            renderProductTable();
+          }).catch(err => {
+            alert("Resim güncellemesinde hata oluştu.");
+          });
+        } else {
+          updateProduct(productId, {
+            title, price, description, brand, discount, features,
+            category, collection, gender, fabric, collar, colors, sizes
+          });
+          alert("Ürün güncellendi!");
+          closeEditForm();
+          renderProductTable();
+        }
+      });
+
+      // Koleksiyon Yönetimi
+      function renderCollectionTable() {
+        const data = getData();
+        const tbody = document.querySelector('#collectionTable tbody');
+        tbody.innerHTML = "";
+        data.collections.forEach(col => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${col.title}</td>
+            <td><img src="${col.image}" alt="${col.title}"></td>
+            <td>${col.link}</td>
+            <td>
+              <button onclick="openEditCollectionForm(${col.id})">Düzenle</button>
+              <button onclick="deleteCollection(${col.id})">Sil</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function updateCollection(collectionId, updatedData) {
+        const data = getData();
+        const index = data.collections.findIndex(c => c.id == collectionId);
+        if (index !== -1) {
+          data.collections[index] = { ...data.collections[index], ...updatedData };
+          saveData(data);
+        }
+      }
+
+      function deleteCollection(collectionId) {
+        const data = getData();
+        data.collections = data.collections.filter(c => c.id != collectionId);
+        saveData(data);
+        renderCollectionTable();
+        populateCollectionSelect();
+      }
+
+      function openEditCollectionForm(collectionId) {
+        const data = getData();
+        const col = data.collections.find(c => c.id == collectionId);
+        if (col) {
+          document.getElementById('editCollectionId').value = col.id;
+          document.getElementById('editCollectionTitle').value = col.title;
+          document.getElementById('editCollectionImage').value = col.image;
+          document.getElementById('editCollectionLink').value = col.link;
+          document.getElementById('editCollectionFormContainer').style.display = "flex";
+        }
+      }
+
+      function closeEditCollectionForm() {
+        document.getElementById('editCollectionFormContainer').style.display = "none";
+      }
+
+      document.getElementById('editCollectionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const collectionId = document.getElementById('editCollectionId').value;
+        const title = document.getElementById('editCollectionTitle').value;
+        const image = document.getElementById('editCollectionImage').value;
+        const link = document.getElementById('editCollectionLink').value;
+        updateCollection(collectionId, { title, image, link });
+        alert("Koleksiyon güncellendi!");
+        closeEditCollectionForm();
+        renderCollectionTable();
+        populateCollectionSelect();
+      });
+
+      // Yaka Yönetimi
+      document.getElementById('collarForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const collar = document.getElementById('collarName').value;
+        data.collars.push({ id: Date.now(), name: collar });
+        saveData(data);
+        alert("Yaka tipi eklendi!");
+        document.getElementById('collarForm').reset();
+        renderCollarTable();
+      });
+
+      function renderCollarTable() {
+        const tbody = document.querySelector('#collarTable tbody');
+        tbody.innerHTML = "";
+        data.collars.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${item.name}</td><td><button onclick="deleteCollar(${item.id})">Sil</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function deleteCollar(id) {
+        data.collars = data.collars.filter(item => item.id !== id);
+        saveData(data);
+        renderCollarTable();
+      }
+
+      // Kumaş Yönetimi
+      document.getElementById('fabricForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fabric = document.getElementById('fabricName').value;
+        data.fabrics.push({ id: Date.now(), name: fabric });
+        saveData(data);
+        alert("Kumaş tipi eklendi!");
+        document.getElementById('fabricForm').reset();
+        renderFabricTable();
+      });
+
+      function renderFabricTable() {
+        const tbody = document.querySelector('#fabricTable tbody');
+        tbody.innerHTML = "";
+        data.fabrics.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${item.name}</td><td><button onclick="deleteFabric(${item.id})">Sil</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function deleteFabric(id) {
+        data.fabrics = data.fabrics.filter(item => item.id !== id);
+        saveData(data);
+        renderFabricTable();
+      }
+
+      // Tab Yönetimi
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          tab.classList.add('active');
+          const contentDiv = document.getElementById(tab.dataset.tab);
+          if (contentDiv) {
+            contentDiv.classList.add('active');
+          }
+          if (tab.dataset.tab === 'manageProduct') {
+            renderProductTable();
+          }
+          if (tab.dataset.tab === 'campaign') {
+            populateCampaignSelect();
+          }
+          if (tab.dataset.tab === 'addProduct') {
+            populateCategorySelect();
+            populateCollectionSelect();
+            populateFabricSelect();
+            populateCollarSelect();
+          }
+          if (tab.dataset.tab === 'collectionManage') {
+            renderCollectionTable();
+          }
+        });
+      });
+
+      window.addEventListener('load', function() {
+        populateCategorySelect();
+        populateCampaignSelect();
+        renderProductTable();
+        renderCollectionTable();
+        populateCollectionSelect();
+        renderCollarTable();
+        renderFabricTable();
+      });
+
+      // readFiles: Base64 dönüştürme
+      function readFiles(files) {
+        const promises = [];
+        for (let i = 0; i < files.length; i++) {
+          promises.push(new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              resolve(e.target.result);
+            };
+            reader.onerror = function(e) {
+              reject(e);
+            };
+            reader.readAsDataURL(files[i]);
+          }));
+        }
+        return Promise.all(promises);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koleksiyonlar - Jakar Collections</title>
+  <style>
+    /* Ortak stiller */
+    body {
+      background: #fff;
+      color: #000;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+    }
+    header .logo img {
+      height: 50px;
+      margin-right: 10px;
+    }
+    header .logo span {
+      color: #f39c12;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    nav ul li {
+      margin: 5px 10px;
+    }
+    nav ul li a {
+      color: #fff;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+    nav ul li a:hover {
+      color: #f39c12;
+    }
+    .search-bar {
+      position: relative;
+    }
+    .search-bar input {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+    }
+    #cart-button {
+      margin-top: 5px;
+    }
+    footer {
+      background: #000;
+      color: #C7A319;
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 2rem;
+      position: relative;
+    }
+    .footer-columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .footer-column h3 {
+      margin-bottom: 0.5rem;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-column ul li {
+      margin-bottom: 0.3rem;
+    }
+    .footer-column ul li a {
+      color: #C7A319;
+      text-decoration: underline;
+    }
+    .footer-logo {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 80px;
+    }
+    /* Koleksiyonlar Grid */
+    .products-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .product-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      flex: 1 1 calc(25% - 1rem);
+      background: #fff;
+      transition: transform 0.3s;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    .product-details {
+      padding: 1rem;
+      text-align: center;
+    }
+    .product-title {
+      font-size: 18px;
+      margin-bottom: 0.5rem;
+    }
+    .product-price {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    /* Responsive */
+    @media (max-width: 992px) {
+      .product-card { flex: 1 1 calc(33.33% - 1rem); }
+    }
+    @media (max-width: 768px) {
+      .product-card { flex: 1 1 calc(50% - 1rem); }
+      nav ul { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .product-card { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="common.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Jakar Collections" />
+      <span>Jakar Collections</span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/index.html">AnaSayfa</a></li>
+        <li><a href="/yenigelenler.html">Yeni Gelenler</a></li>
+        <li><a href="/koleksiyonlar.html">Koleksiyonlar</a></li>
+        <li><a href="/kampanyalar.html">Kampanyalar</a></li>
+        <li><a href="/hakkimizda.html">Hakkımızda</a></li>
+        <li><a href="/all-products.html">Tüm Ürünler</a></li>
+        <li><a href="/iletisim.html">İletişim</a></li>
+      </ul>
+    </nav>
+    <div class="search-bar">
+      <input type="text" placeholder="Ara..." id="header-search" />
+    </div>
+    <div id="cart-button" style="cursor: pointer;">Sepet (<span id="cart-count">0</span>)</div>
+  </header>
+
+  <main>
+    <div class="products-container" id="products">
+      <!-- Koleksiyona ait ürünler burada listelenecek -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h3>Kategoriler</h3>
+        <ul id="footerCategories">
+          <!-- Dinamik olarak eklenecek -->
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>Ödeme / KVKK</h3>
+        <ul>
+          <li><a href="#">Kredi Kartı</a></li>
+          <li><a href="#">Havale/EFT</a></li>
+          <li><a href="#">PayPal (Yurt Dışı)</a></li>
+          <li><a href="#">KVKK Politikası</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h3>İletişim</h3>
+        <ul>
+          <li><a href="mailto:jakarcollections@gmail.com">jakarcollections@gmail.com</a></li>
+          <li><a href="https://wa.me/905013724347">WhatsApp: 05013724347</a></li>
+          <li><a href="https://instagram.com/jakarcollections" target="_blank">Instagram: @jakarcollections</a></li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top: 1rem;">&copy; 2025 Jakar Collections - Tüm Hakları Saklıdır.</p>
+    <img src="logo.png" alt="Jakar Collections" class="footer-logo" />
+  </footer>
+
+  <script>
+    // Koleksiyon sayfasında URL'den collection parametresini alalım
+    const params = new URLSearchParams(window.location.search);
+    const collectionFilter = params.get('collection'); // örn. "kis", "yaz", vb.
+
+    const data = getData();
+    // Filtreleme: Ürünlerin category değeri, URL'deki collection parametresi ile eşleşiyorsa görüntülenecek
+    const productsContainer = document.getElementById('products');
+    let filteredProducts = [];
+    if (collectionFilter) {
+      filteredProducts = data.products.filter(product =>
+        product.category && product.category.toLowerCase() === collectionFilter.toLowerCase()
+      );
+    } else {
+      filteredProducts = data.products; // Eğer parametre yoksa tüm ürünler gösterilir
+    }
+    
+    // Ürün kartlarını oluşturma
+    if(filteredProducts.length > 0) {
+      filteredProducts.forEach(product => {
+        let priceHtml = `₺${product.price}`;
+        if (product.discount >= 15) {
+          const discountedPrice = (product.price * (1 - product.discount / 100)).toFixed(2);
+          priceHtml = `<s>₺${product.price}</s><br/>₺${discountedPrice}`;
+        }
+        const card = document.createElement('a');
+        card.href = `/product.html?id=${product.id}`;
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${product.images ? product.images[0] : 'images/default.png'}" alt="${product.title}">
+          <div class="product-details">
+            <h3 class="product-title">${product.title}</h3>
+            <p class="product-price">${priceHtml}</p>
+          </div>
+        `;
+        productsContainer.appendChild(card);
+      });
+    } else {
+      productsContainer.innerHTML = `<p style="text-align: center; width: 100%;">Bu koleksiyona ait ürün bulunamadı.</p>`;
+    }
+  </script>
+</body>
+</html>
